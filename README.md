@@ -10,9 +10,9 @@ parishak.ai/
 │   ├── cleaned/          # Processed job data
 │   └── annotated/        # Final annotated data
 └── src/                  # Source code
-    ├── scraper.py       # Web scraper for job postings
-    ├── cleaner.py       # Data cleaning module
-    ├── annotator.py     # Job annotation module
+    ├── scraper.py       # Simulates job posting data (dummy dataset generator)
+    ├── cleaner.py       # Cleans raw job data
+    ├── annotator.py     # Annotates processed data
     └── utils.py         # Utility functions
 ```
 
