@@ -21,7 +21,6 @@ class JobAnnotator:
             'QA': ['qa', 'testing', 'test automation', 'selenium']
         }
         
-        # Education requirements
         self.education_levels = {
             'No Degree': ['no degree', 'high school', 'diploma'],
             'Bachelor\'s': ['bachelor', 'b.tech', 'b.e.', 'bsc', 'bs '],
@@ -30,6 +29,8 @@ class JobAnnotator:
         }
 
     def get_experience(self, text: str) -> str:
+        if not text or not isinstance(text, str):
+            return 'Not specified'
         text = text.lower()
         for level, keywords in self.experience_levels.items():
             if any(keyword in text for keyword in keywords):
@@ -37,6 +38,8 @@ class JobAnnotator:
         return 'Mid'
     
     def get_job_type(self, text: str) -> str:
+        if not text or not isinstance(text, str):
+            return 'Not specified'
         text = text.lower()
         for job_type, keywords in self.job_keywords.items():
             if any(keyword in text for keyword in keywords):
@@ -44,6 +47,8 @@ class JobAnnotator:
         return 'Other'
     
     def get_education(self, text: str) -> str:
+        if not text or not isinstance(text, str):
+            return 'Not specified'
         text = text.lower()
         if 'phd' in text or 'doctorate' in text:
             return 'PhD'
@@ -52,7 +57,8 @@ class JobAnnotator:
         return 'Bachelor\'s'
     
     def get_salary(self, text: str) -> str:
-        # Simple salary detection - can be enhanced later
+        if not text or not isinstance(text, str):
+            return 'Not specified'
         text = text.lower()
         if 'lpa' in text or 'lakh' in text:
             return 'Competitive'
@@ -78,19 +84,15 @@ class JobAnnotator:
 
 def main():
     try:
-        # Load and process jobs
         jobs = load_json('data/cleaned/jobs_cleaned.json')
         print(f"Loaded {len(jobs)} jobs")
         
-        # Annotate jobs
         annotator = JobAnnotator()
         annotated_jobs = annotator.process_jobs(jobs)
         
-        # Save results
         save_json(annotated_jobs, 'data/annotated/jobs_annotated.json')
         save_csv(annotated_jobs, 'data/annotated/jobs_annotated.csv')
         
-        # Show sample
         if annotated_jobs:
             print("\nSample job:")
             job = annotated_jobs[0]
