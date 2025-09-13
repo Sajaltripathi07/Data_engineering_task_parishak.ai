@@ -2,7 +2,6 @@ import json
 import random
 from datetime import datetime, timedelta
 
-# Sample job data
 titles = ["Software Engineer", "Data Scientist", "Frontend Developer", "DevOps Engineer", "Backend Developer"]
 companies = ["TechCorp", "DataSystems", "WebSolutions", "CloudTech", "AI Innovations"]
 descriptions = [
@@ -13,7 +12,6 @@ descriptions = [
     "Backend developer with expertise in Node.js and databases."
 ]
 
-# Generate test data
 test_jobs = []
 for i in range(10):
     job = {
@@ -28,7 +26,6 @@ for i in range(10):
     }
     test_jobs.append(job)
 
-# Save to file
 with open('data/raw/test_jobs.json', 'w') as f:
     json.dump(test_jobs, f, indent=2)
 
