@@ -6,7 +6,6 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from typing import List, Dict, Any
 
-# Download NLTK data once
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
@@ -22,12 +21,9 @@ class DataCleaner:
             'docker', 'kubernetes', 'html', 'css', 'node.js', 'git', 'github'
         ]
         self.job_stopwords = {
-            'senior', 'junior', 'lead', 'manager', 'developer', 'engineer',
-            'software', 'fullstack', 'full-stack', 'full', 'stack', 'web',
-            'application', 'applications', 'applicant', 'applicants',
-            'experience', 'required', 'requirements', 'skills', 'skill',
+            'applicant', 'applicants', 'required', 'requirements',
             'ability', 'abilities', 'work', 'working', 'job', 'position',
-            'role', 'responsibilities', 'duties', 'tasks', 'project', 'projects'
+            'role', 'responsibilities', 'duties', 'tasks'
         }
         self.stop_words = self.stop_words - self.job_stopwords
 
@@ -36,9 +32,9 @@ class DataCleaner:
             return ""
             
         text = text.lower()
-        text = re.sub(r'https?://\S+|www\.\S+', '', text)  # Remove URLs
-        text = re.sub(r'<.*?>', '', text)  # Remove HTML
-        text = re.sub(r'[^a-z\s]', ' ', text)  # Keep only letters and spaces
+        text = re.sub(r'https?://\S+|www\.\S+', '', text)
+        text = re.sub(r'<.*?>', '', text)
+        text = re.sub(r'[^a-z\s]', ' ', text)
         
         tokens = word_tokenize(text)
         tokens = [self.lemmatizer.lemmatize(t) for t in tokens 
@@ -54,22 +50,31 @@ class DataCleaner:
 
     def clean_job(self, job: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            # Clean text fields
+            if not job.get('job_id'):
+                print("Skipping job: missing job_id")
+                return None
+                
             job['title'] = self.clean_text(job.get('title', ''))
             job['description'] = self.clean_text(job.get('description', ''))
             job['company'] = self.clean_text(job.get('company', ''))
             job['location'] = self.clean_text(job.get('location', ''))
             
-            # Add skills
+            if not job['title'] and not job['company']:
+                print(f"Skipping job {job.get('job_id', 'unknown')}: missing title and company")
+                return None
+            
             job['skills'] = self.get_skills(job['description'])
             
-            # Keep original description
-            job['raw_description'] = job.get('description', '')[:500]  # Keep first 500 chars
+            original_desc = job.get('description', '')
+            if isinstance(original_desc, str):
+                job['raw_description'] = original_desc[:500]
+            else:
+                job['raw_description'] = str(original_desc)[:500]
             
             return job
             
         except Exception as e:
-            print(f"Error with job {job.get('job_id', 'unknown')}")
+            print(f"Error with job {job.get('job_id', 'unknown')}: {e}")
             return None
 
     def process_jobs(self, jobs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -80,7 +85,6 @@ def main():
     try:
         cleaner = DataCleaner()
         
-        # Process input files
         input_files = [
             'data/raw/jobs_raw.json',
             'data/raw/test_jobs.json'
@@ -103,7 +107,6 @@ def main():
             print("No valid jobs found")
             return
         
-        # Save results
         save_json(all_jobs, 'data/cleaned/jobs_cleaned.json')
         save_csv(all_jobs, 'data/cleaned/jobs_cleaned.csv')
         
